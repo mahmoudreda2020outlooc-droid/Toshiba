@@ -1,9 +1,57 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+
+    // 0. Password Protection
+    const passwordOverlay = document.getElementById('password-overlay');
+    const sitePasswordInput = document.getElementById('site-password');
+    const unlockBtn = document.getElementById('unlock-btn');
+    const passwordError = document.getElementById('password-error');
+    const CORRECT_PASSWORD = '153248';
+
+    // Check if already unlocked in this session
+    if (sessionStorage.getItem('site_unlocked') === 'true') {
+        if (passwordOverlay) passwordOverlay.style.display = 'none';
+    }
+
+    const verifyPassword = () => {
+        if (sitePasswordInput.value === CORRECT_PASSWORD) {
+            sessionStorage.setItem('site_unlocked', 'true');
+            if (passwordOverlay) {
+                passwordOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    passwordOverlay.style.display = 'none';
+                }, 500);
+            }
+            passwordError.style.display = 'none';
+        } else {
+            passwordError.style.display = 'block';
+            sitePasswordInput.value = '';
+            sitePasswordInput.focus();
+
+            // Shake effect
+            const card = document.querySelector('.password-card');
+            if (card) {
+                card.style.animation = 'none';
+                void card.offsetWidth; // trigger reflow
+                card.style.animation = 'shake 0.4s ease-in-out';
+            }
+        }
+    };
+
+    if (unlockBtn) {
+        unlockBtn.addEventListener('click', verifyPassword);
+    }
+
+    if (sitePasswordInput) {
+        sitePasswordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verifyPassword();
+        });
+    }
+
+
     // 1. Mobile Menu Toggle
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');
-    
+
     if (mobileMenuBtn && navLinks) {
         mobileMenuBtn.addEventListener('click', () => {
             // Toggle display block/none
@@ -46,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navLinks.style.padding = '0';
         } else if (window.innerWidth <= 992 && navLinks) {
             navLinks.style.display = 'none';
-            if(mobileMenuBtn) mobileMenuBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+            if (mobileMenuBtn) mobileMenuBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
         }
     });
 
@@ -55,10 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
     faqQuestions.forEach(question => {
         question.addEventListener('click', () => {
             const faqItem = question.parentElement;
-            
+
             // Close other open faqs
             document.querySelectorAll('.faq-item').forEach(item => {
-                if(item !== faqItem) {
+                if (item !== faqItem) {
                     item.classList.remove('active');
                 }
             });
@@ -72,8 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
-            if(targetId === '#') return;
-            
+            if (targetId === '#') return;
+
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
                 // Adjust scroll position for sticky navbar
@@ -93,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const navbarHeight = document.querySelector('.navbar').offsetHeight;
 
         sections.forEach(section => {
-            const sectionTop = section.offsetTop - navbarHeight - 50; 
+            const sectionTop = section.offsetTop - navbarHeight - 50;
             const sectionHeight = section.clientHeight;
             if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
                 current = section.getAttribute('id');
@@ -115,18 +163,18 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const submitBtn = bookingForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
-            
+
             // Loading state
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الإرسال...';
             submitBtn.style.opacity = '0.7';
-            
+
             setTimeout(() => {
                 // Success state
                 submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> تم استلام طلبك بنجاح!';
                 submitBtn.style.backgroundColor = 'var(--success-green)';
                 submitBtn.style.opacity = '1';
                 bookingForm.reset();
-                
+
                 // Reset button after 3 seconds
                 setTimeout(() => {
                     submitBtn.innerHTML = originalText;

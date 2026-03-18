@@ -19,6 +19,31 @@
 </head>
 
 <body>
+    <!-- Password Protection Overlay -->
+    <div id="password-overlay" class="password-overlay">
+        <div class="password-card">
+            <div class="password-header">
+                <div class="password-logo-container">
+                    <span class="logo-red">Toshiba</span> <span class="logo-gray">Maintenance</span>
+                </div>
+                <h2>دخول المصرح لهم فقط</h2>
+                <p>يرجى إدخال كلمة المرور للوصول إلى الموقع</p>
+            </div>
+            <div class="password-body">
+                <div class="password-input-wrapper">
+                    <input type="password" id="site-password" placeholder="كلمة المرور" autocomplete="current-password">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <button id="unlock-btn" class="btn btn-primary btn-block">
+                    دخول <i class="fa-solid fa-right-to-bracket"></i>
+                </button>
+                <div id="password-error" class="error-msg"
+                    style="display: none; color: var(--toshiba-red); margin-top: 10px; font-weight: 700; text-align: center;">
+                    كلمة المرور غير صحيحة، حاول مرة أخرى.</div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Top Ticker Bar -->
     <div class="top-ticker">
