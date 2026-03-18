@@ -5,26 +5,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const sitePasswordInput = document.getElementById('site-password');
     const unlockBtn = document.getElementById('unlock-btn');
     const passwordError = document.getElementById('password-error');
-    const CORRECT_PASSWORD = '153248';
+
 
     // Check if already unlocked in this session
     if (sessionStorage.getItem('site_unlocked') === 'true') {
         if (passwordOverlay) passwordOverlay.style.display = 'none';
     }
 
-    const verifyPassword = () => {
-        if (sitePasswordInput.value === CORRECT_PASSWORD) {
-            sessionStorage.setItem('site_unlocked', 'true');
-            if (passwordOverlay) {
-                passwordOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    passwordOverlay.style.display = 'none';
-                }, 500);
+    const verifyPassword = async () => {
+        const password = sitePasswordInput.value;
+
+        // Disable input and button while loading
+        sitePasswordInput.disabled = true;
+        unlockBtn.disabled = true;
+        unlockBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التحقق...';
+
+        try {
+            const response = await fetch('/api/verify-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ password }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                sessionStorage.setItem('site_unlocked', 'true');
+                if (passwordOverlay) {
+                    passwordOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        passwordOverlay.style.display = 'none';
+                    }, 500);
+                }
+                passwordError.style.display = 'none';
+            } else {
+                throw new Error('Invalid password');
             }
-            passwordError.style.display = 'none';
-        } else {
+        } catch (error) {
             passwordError.style.display = 'block';
             sitePasswordInput.value = '';
+            sitePasswordInput.disabled = false;
+            unlockBtn.disabled = false;
+            unlockBtn.innerHTML = 'دخول <i class="fa-solid fa-right-to-bracket"></i>';
             sitePasswordInput.focus();
 
             // Shake effect
@@ -36,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
+
 
     if (unlockBtn) {
         unlockBtn.addEventListener('click', verifyPassword);
